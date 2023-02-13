@@ -1,0 +1,329 @@
+datasource db {
+  provider = "postgresql"
+  url      = ""
+  shadowDatabaseUrl = ""
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Receipt {
+    id                   Int                @id @default(autoincrement())
+    uid                  String?            @db.VarChar(255)
+    status               ReceiptStatus
+    discount             Decimal
+    extra_charge         Decimal
+    cashier              Cashier            @relation(fields: [cashierId], references: [id])
+    cashierId            Int
+    payments             Payment[]
+    receiptDetails       ReceiptDetails[]
+    BlizId               Int?
+    qrCodeUrl            String?
+    localCounter         Int?
+    errorMessage         String?
+
+    returnReceipt        Boolean            @default(false)
+    returnReceiptNumber  String?
+
+    datetimeCreated      DateTime           @default(now())
+    datetimeSentRequest  DateTime?
+
+	entrepreneurId       Int?
+    entrepreneur         Entrepreneur?      @relation(fields: [entrepreneurId], references: [id])
+}
+
+enum ReceiptStatus {
+    ToCreate
+    Processing
+    Done
+    Error
+}
+
+model Payment {
+    id                Int          @id @default(autoincrement())
+    receipt           Receipt      @relation(fields: [receiptId], references: [id])
+    receiptId         Int
+    sum               Decimal
+    provided          Decimal
+    remains           Decimal?
+    paymentTypeCode   String
+}
+
+model ReceiptDetails {
+    id           Int             @id @default(autoincrement())
+    product_name String          @db.VarChar(255)
+    discount     Decimal
+    extra_charge Decimal
+    quantity     Decimal
+    price        Decimal
+    receipt      Receipt         @relation(fields: [receiptId], references: [id])
+    receiptId    Int
+    unitCode     String          @db.VarChar(5)
+    internalCode Int
+    uktzed       String?         @db.VarChar(10)
+    taxes        Tax[]
+    exciseLabels ExciseLabel[]
+}
+
+model ExciseLabel {
+    id                      Int                 @id @default(autoincrement())
+    receiptDetails          ReceiptDetails      @relation(fields: [receiptDetailsId], references: [id])
+	receiptDetailsId        Int
+    exciseLabel             String              @db.VarChar(64)
+}
+
+model Tax {
+    id                      Int                 @id @default(autoincrement())
+    receiptDetails          ReceiptDetails      @relation(fields: [receiptDetailsId], references: [id])
+    receiptDetailsId        Int
+    taxName                 String              @db.VarChar(255)
+    taxLetter               String              @db.VarChar(1)
+    taxCode                 Int
+    taxPercent              Float               @db.DoublePrecision
+    additionalTaxPercent    Float               @db.DoublePrecision @default(0)
+}
+
+model ShiftTransaction {
+    id                       Int                   @id @default(autoincrement())
+    datetimeCreated          DateTime              @default(now())
+    datetimeToRun            DateTime
+    datetimeRunned           DateTime?
+    cashier                  Cashier               @relation(fields: [cashierId], references: [id])
+    cashierId                Int
+    type                     ShiftTransactionType
+    status                   TransactionStatus
+    priority                 Int                   @default(1)
+    errorMessage             String?
+	data                     Json?                 @db.JsonB()
+	localBalance             Float                 @db.DoublePrecision @default(0)
+	automatic				 Boolean               @default(false)
+}
+
+enum TransactionStatus {
+    ToCreate
+    Processing
+    Done
+    Error
+}
+
+enum ShiftTransactionType {
+    ShiftOpen
+    ServiceOutput
+    ZRep
+    ShiftClose
+}
+
+
+model CashService {
+    id               Int                 @id @default(autoincrement())
+    cashier          Cashier             @relation(fields: [cashierId], references: [id])
+    cashierId        Int
+    status           CashServiceStatus
+    sum              Decimal
+    qrCodeUrl        String?
+    errorMessage     String?
+    datetimeCreated  DateTime            @default(now())
+}
+
+enum CashServiceStatus {
+    ToCreate
+    Processing
+    Done
+    Error
+}
+
+model XReport {
+    id             Int                 @id @default(autoincrement())
+    cashier        Cashier             @relation(fields: [cashierId], references: [id])
+    cashierId      Int
+    status         TransactionStatus   @default(value: ToCreate)
+    data           Json?               @db.JsonB()
+}
+
+enum XReportStatus {
+    ToCreate
+	Processing
+	Done
+	Error
+}
+
+model PeriodicalReport {
+    id               Int                @id @default(autoincrement())
+    status           TransactionStatus
+    cashier          Cashier            @relation(fields: [cashierId], references: [id])
+    cashierId        Int
+    periodStartDate  DateTime
+    periodEndDate    DateTime
+    data             Json?              @db.JsonB()
+    errorMessage     String?
+}
+
+model Cashier {
+    id                        Int        @id @default(autoincrement())
+    object                    Object     @relation(fields: [objectId], references: [id])
+    objectId                  Int
+    register_number           String     @db.VarChar(255)
+    desk_number               String     @db.VarChar(255)
+    localCounter              Int        @default(1)
+
+    shiftOpenTime             DateTime?  @db.Time(3)
+    shiftCloseTime            DateTime?  @db.Time(3)
+    shiftOutputTime           DateTime?  @db.Time(3)
+    licenseExpireDateTime     DateTime
+    licenseExpireMessage      String
+    XReports                  XReport[]
+    CashService               CashService[]
+    Receipt                   Receipt[]
+    ShiftTransactions         ShiftTransaction[]
+    PeriodicalReports         PeriodicalReport[]
+	productDecorators         ProductDecorator[]
+
+	sellContextId  	   Int?
+	sellContext        SellContext?    @relation(fields: [sellContextId], references: [id])
+}
+
+model Object {
+	id                 Int                @id @default(autoincrement())
+	name               String             @db.VarChar(255)
+	adress             String             @db.VarChar(255)
+	organization       Organization       @relation(fields: [organizationId], references: [id])
+	organizationId     Int
+	cashiers           Cashier[]
+	productDecorators  ProductDecorator[]
+
+	sellContextId  	   Int?
+	sellContext        SellContext?    @relation(fields: [sellContextId], references: [id])
+}
+
+model Organization {
+	id                 Int            @id @default(autoincrement())
+	name               String         @db.VarChar(255)
+	objects            Object[]
+	entrepreneur       Entrepreneur   @relation(fields: [entrepreneurId], references: [id])
+	entrepreneurId     Int
+	productDecorators  ProductDecorator[]
+
+	sellContextId  	   Int?
+	sellContext        SellContext?    @relation(fields: [sellContextId], references: [id])
+}
+
+model Entrepreneur {
+	id                 Int             @id @default(autoincrement())
+	full_name          String          @db.VarChar(255)
+	IPN                String          @db.VarChar(255)
+	TIN                String          @db.VarChar(255)
+	organization       Organization?
+	account            Account         @relation(fields: [accountId], references: [id])
+	accountId          Int
+	contactInfo        String?
+	signKeys           SignKey[]
+	receipts           Receipt[]
+	productDecorators  ProductDecorator[]
+
+	sellContextId  	   Int?
+    sellContext        SellContext?    @relation(fields: [sellContextId], references: [id])
+}
+
+model SignKey {
+    id               Int             @id @default(autoincrement())
+	key              Bytes?          @db.ByteA
+	certificate      Bytes?          @db.ByteA
+	keyPath          String?
+	certPath         String?
+	role             String?
+	password         String?
+	entrepreneurId   Int
+	entrepreneur     Entrepreneur    @relation(fields: [entrepreneurId], references: [id])
+}
+
+model Account {
+	id            	   Int             @id @default(autoincrement())
+	name			   String
+	email              String          @db.VarChar(255) @unique
+	password           String          @db.VarChar(255)
+	createdAt          DateTime        @default(now()) @map(name: "created_at")
+	entrepreneurs      Entrepreneur[]
+
+	sellContextId  	   Int?
+    sellContext        SellContext?    @relation(fields: [sellContextId], references: [id])
+
+    productDecorators  ProductDecorator[]
+}
+
+
+
+model SellContext {
+	id               Int             @id @default(autoincrement())
+	name			 String?
+	accounts         Account[]
+	entrepreneur     Entrepreneur[]
+	organization     Organization[]
+	object           Object[]
+	cashier          Cashier[]
+	products         Product[]
+}
+
+model Product {
+	id                  Int             @id @default(autoincrement())
+	name			    String
+	price               Decimal
+	uktzed              String?         @db.VarChar(10)
+    internalCode        Int
+
+    unitId         	    Int
+	unit                ProductUnit     @relation(fields: [unitId], references: [id])
+
+	sellContextId  	    Int
+	sellContext         SellContext     @relation(fields: [sellContextId], references: [id])
+
+	taxes               TaxElement[]
+
+	productDecorators   ProductDecorator[]
+}
+
+model ProductDecorator {
+	id               Int             @id @default(autoincrement())
+
+	productId  	     Int
+	product          Product         @relation(fields: [productId], references: [id])
+
+	accountId  	     Int?
+	account          Account?        @relation(fields: [accountId], references: [id])
+
+	entrepreneurId   Int?
+	entrepreneur     Entrepreneur?   @relation(fields: [entrepreneurId], references: [id])
+
+	organizationId   Int?
+	organization     Organization?   @relation(fields: [organizationId], references: [id])
+
+	objectId         Int?
+	object           Object?         @relation(fields: [objectId], references: [id])
+
+	cashierId   	 Int?
+	cashier     	 Cashier?   	 @relation(fields: [cashierId], references: [id])
+}
+
+model ProductUnit {
+	id               Int             @id @default(autoincrement())
+	name			 String
+	code			 String
+	products         Product[]
+}
+
+model TaxElement {
+	id               Int             @id @default(autoincrement())
+	name			 String
+	letter			 String
+	percent			 Decimal
+	typeId  	     Int
+	type             TaxElementType  @relation(fields: [typeId], references: [id])
+	products         Product[]
+}
+
+model TaxElementType {
+	id               Int             @id @default(autoincrement())
+	name			 String
+	code			 String
+	taxElements      TaxElement[]
+}

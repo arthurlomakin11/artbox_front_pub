@@ -1,0 +1,57 @@
+@media print {
+    .ReceiptImage {
+        visibility: visible;
+        position: fixed;
+        width: 100% !important;
+        inset: 0;
+        image-rendering: pixelated;
+        image-rendering: -webkit-optimize-contrast;
+    }
+    .ReceiptViewBottom img {
+        visibility: hidden;
+    }
+}
+
+.ReceiptView {
+    position: fixed;
+    inset: 20px;
+    left: auto;
+    background: #fff;
+    box-shadow: 0 0 16px #00000052;
+    overflow: auto;
+    height: min-content;
+    border-radius: 10px;
+
+    td {
+        padding: 10px;
+    }
+
+    :focus {
+        outline: none;
+    }
+}
+
+.ReceiptImage {
+    width: 80mm;
+    image-rendering: pixelated;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+.ReceiptViewBottom {
+    padding: 10px;
+    background: gray;
+    display: flex;
+}
+
+.Body {
+    overflow: auto;
+    white-space: pre-wrap;
+    height: 100%;
+    width: min-content;
+    margin: 100px;
+}
+
+.CloseButton {
+    padding: 5px;
+    margin: 10px 10px 10px auto;
+}

@@ -1,0 +1,10 @@
+.Grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.GridItem {
+    padding: 10px;
+    margin: 10px;
+    background: gray;
+}

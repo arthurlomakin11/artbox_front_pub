@@ -1,0 +1,44 @@
+.GetReceiptsButton {
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
+.Input {
+    font-size: 20px;
+    padding: 3px;
+}
+
+.DatePicker {
+    width: 120px;
+    text-align: center;
+}
+
+.TopMenu {
+    display: flex;
+    padding: 10px;
+    background: #f2b490;
+}
+
+.cashierInput {
+    width: 100px;
+}
+
+.cashierSelector__Name, .dateSelector__Name {
+    margin-right: 10px;
+}
+
+.TopMenuElement {
+    margin: 0 10px;
+}
+
+.Body {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.Table td:global {
+    padding: 10px;
+    text-align: center;
+}

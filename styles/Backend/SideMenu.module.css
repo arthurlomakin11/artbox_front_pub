@@ -1,0 +1,52 @@
+.SideMenu {
+    width: 16%;
+    font-size: 25px;
+    box-shadow: 0 0 20px #00000026;
+    display: flex;
+    flex-direction: column;
+    background: #f4f4f4;
+}
+
+.AccountGreeting {
+    font-size: 20px;
+}
+
+.signOutButton {
+    height: 50px;
+    width: 50px;
+    margin: auto 10px 10px;
+    align-self: center;
+    border: 0;
+    cursor: pointer;
+    user-select: none;
+    background: none;
+}
+
+.SideMenuElement {
+    font-size: 18px;
+    padding: 5px;
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.SideMenuElement__Image {
+    margin-right: 5px;
+    height: 20px;
+}
+
+.Link {
+    text-decoration: none;
+    color: black;
+    display: block;
+    width: 100%;
+}
+
+.SideMenuElementActive {
+    background: #00800045;
+}
+
+.SideMenuGroupName {
+    font-size: 17px;
+    margin-left: 10px;
+}

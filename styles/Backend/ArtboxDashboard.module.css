@@ -1,0 +1,15 @@
+.ArtboxDashboard {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    min-height: 100vh;
+    align-items: stretch;
+    font-size: 25px;
+}
+
+.Main {
+    width: 84%;
+    position: relative;
+    overflow-y: auto;
+    height: 100vh;
+}

@@ -1,0 +1,32 @@
+.TabComponent {
+    margin: 0 30%;
+}
+
+.Body {
+    position: relative;
+    height: 90%;
+}
+
+.Tabs {
+    margin: 0 20%;
+    position: relative;
+    height: 10%;
+    display: flex;
+}
+
+.Tabs_Button {
+    width: 100%;
+    margin: 0 10px;
+    border: 0;
+    background: #534645;
+    cursor: pointer;
+    font-size: 20px;
+    border-radius: 9px;
+    color: #bdbdbd;
+    transition: .2s;
+}
+
+.Tabs_ButtonActive {
+    background: #c33c29;
+    color: white;
+}

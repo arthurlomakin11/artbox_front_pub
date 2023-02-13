@@ -1,0 +1,9 @@
+.main {
+    display: flex;
+}
+
+.cell {
+    max-width: 30vw;
+    overflow: hidden;
+    padding: 10px;
+}
